@@ -4,8 +4,6 @@ import Footer from "../../components/Footer";
 export default function AuthorPage() {
   return (
     <>
-      <Navbar />
-
       <main className="min-h-screen bg-[#F7F2EB]">
 
         <section className="max-w-7xl mx-auto px-6 py-24">

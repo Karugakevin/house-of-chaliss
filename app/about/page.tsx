@@ -1,88 +1,63 @@
-import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 
 export default function AboutPage() {
   return (
     <>
-      <Navbar />
-
       <main className="bg-[#F7F2EB] min-h-screen">
 
         <section className="max-w-6xl mx-auto px-6 py-24">
 
           <p className="uppercase tracking-[5px] text-amber-700 font-semibold">
-            About the Book
+            Meet the Author
           </p>
 
           <h1 className="text-6xl font-bold mt-4 text-[#1F2D3D]">
-            House of Chaliss
+            Kevo
           </h1>
 
-          <h2 className="text-3xl mt-4 text-gray-600">
-            Book One – Experience of Being Kevo
-          </h2>
+          <div className="grid lg:grid-cols-2 gap-16 mt-20 items-center">
 
-          <div className="grid lg:grid-cols-2 gap-16 mt-20">
-
-            <div>
-
+            <div className="flex justify-center">
               <img
-                src="/cover.jpg"
-                alt="House of Chaliss"
-                className="rounded-2xl shadow-2xl"
+                src="/author.jpg"
+                alt="Kevo"
+                className="w-[420px] rounded-2xl shadow-2xl"
               />
-
             </div>
 
             <div>
 
-              <h3 className="text-3xl font-bold">
-                Story Overview
-              </h3>
+              <h2 className="text-3xl font-bold">
+                About Kevo
+              </h2>
 
               <p className="mt-8 leading-9 text-lg text-gray-700">
-                Replace this with your official synopsis.
+                Kevo is a Kenyan author passionate about telling stories that
+                explore love, identity, resilience, and the hidden struggles
+                that shape who we become. Through emotionally rich characters
+                and gripping plots, he creates stories that stay with readers
+                long after the final page.
               </p>
 
               <p className="mt-6 leading-9 text-lg text-gray-700">
-                This page will become the official sales page for
-                House of Chaliss Book One.
+                <strong>House of Chaliss: Book One – Experience of Being Kevo</strong>; 
+                marks the beginning of a larger series that blends romance,
+                mystery, suspense, and personal transformation into an
+                unforgettable reading experience.
               </p>
 
-              <div className="mt-12">
+              <p className="mt-6 leading-9 text-lg text-gray-700">
+                Beyond writing, Kevo is passionate about youth empowerment,
+                public participation, leadership, and inspiring meaningful
+                conversations through storytelling.
+              </p>
 
-                <h3 className="text-2xl font-bold">
-                  Genres
-                </h3>
-
-                <div className="flex flex-wrap gap-4 mt-6">
-
-                  <span className="bg-white px-5 py-3 rounded-full shadow">
-                    Romance
-                  </span>
-
-                  <span className="bg-white px-5 py-3 rounded-full shadow">
-                    Mystery
-                  </span>
-
-                  <span className="bg-white px-5 py-3 rounded-full shadow">
-                    Thriller
-                  </span>
-
-                  <span className="bg-white px-5 py-3 rounded-full shadow">
-                    Young Adult
-                  </span>
-
-                </div>
-
-                <a
-                  href="/checkout"
-                  className="inline-block mt-12 bg-amber-700 hover:bg-amber-800 text-white px-10 py-4 rounded-xl font-semibold"
-                >
-                  Buy for KES 650
-                </a>
-
-              </div>
+              <a
+                href="/books"
+                className="inline-block mt-10 bg-amber-700 hover:bg-amber-800 text-white px-10 py-4 rounded-xl font-semibold"
+              >
+                Explore the Books
+              </a>
 
             </div>
 

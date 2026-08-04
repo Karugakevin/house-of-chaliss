@@ -1,249 +1,194 @@
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { books } from "../../data/books";
+import PriceTag from "../../components/PriceTag";
 
 export default function CheckoutPage() {
-  return (
-    <>
-      <Navbar />
-
-      <main className="min-h-screen bg-[#F7F2EB]">
-
-        {/* Hero */}
-        <section className="bg-[#1F2D3D] text-white py-20">
-          <div className="max-w-5xl mx-auto px-6 text-center">
-
-            <p className="uppercase tracking-[5px] text-amber-400 font-semibold">
-              Secure Checkout
-            </p>
-
-            <h1 className="text-5xl md:text-6xl font-bold mt-4">
-              Complete Your Purchase
-            </h1>
-
-            <p className="mt-8 text-xl text-gray-300 max-w-3xl mx-auto leading-9">
-              You're just one step away from reading
-              <strong> House of Chaliss: Book One – Experience of Being Kevo.</strong>
-            </p>
-
-          </div>
-        </section>
-
-        <section className="max-w-7xl mx-auto px-6 py-20">
-
-          <div className="grid lg:grid-cols-2 gap-16">
-
-            {/* LEFT */}
-
-            <div>
-
-              <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-
-                <img
-                  src="/cover.jpg"
-                  alt="House of Chaliss"
-                  className="w-full"
-                />
-
-                <div className="p-8">
-
-                  <span className="text-amber-700 font-semibold">
-                    BOOK ONE
-                  </span>
-
-                  <h2 className="text-4xl font-bold mt-3">
-                    House of Chaliss
-                  </h2>
-
-                  <p className="text-xl text-gray-600 mt-2">
-                    Experience of Being Kevo
-                  </p>
-
-                  <div className="mt-8 space-y-3 text-gray-700">
-
-                    <p>✓ PDF eBook</p>
-
-                    <p>✓ Instant Download</p>
-
-                    <p>✓ Read on Phone, Tablet & Computer</p>
-
-                    <p>✓ Lifetime Access</p>
-
-                  </div>
-
-                  <div className="border-t mt-10 pt-8">
-
-                    <div className="flex justify-between text-2xl font-bold">
-
-                      <span>Total</span>
-
-                      <span className="text-amber-700">
-                        KES 650
-                      </span>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* RIGHT */}
-
-            <div>
-
-              <div className="bg-white rounded-3xl shadow-xl p-10">
-
-                <h2 className="text-3xl font-bold">
-                  Customer Information
-                </h2>
-
-                <form className="space-y-6 mt-10">
-
-                  <div>
-
-                    <label className="block mb-2 font-semibold">
-                      Full Name
-                    </label>
-
-                    <input
-                      type="text"
-                      placeholder="Your Full Name"
-                      className="w-full border border-gray-300 rounded-xl px-4 py-4 focus:ring-2 focus:ring-amber-600 outline-none"
-                    />
-
-                  </div>
-
-                  <div>
-
-                    <label className="block mb-2 font-semibold">
-                      Email Address
-                    </label>
-
-                    <input
-                      type="email"
-                      placeholder="you@example.com"
-                      className="w-full border border-gray-300 rounded-xl px-4 py-4 focus:ring-2 focus:ring-amber-600 outline-none"
-                    />
-
-                  </div>
-
-                  <div>
-
-                    <label className="block mb-2 font-semibold">
-                      Phone Number (M-Pesa)
-                    </label>
-
-                    <input
-                      type="tel"
-                      placeholder="07XXXXXXXX"
-                      className="w-full border border-gray-300 rounded-xl px-4 py-4 focus:ring-2 focus:ring-amber-600 outline-none"
-                    />
-
-                  </div>
-
-                  <hr className="my-8" />
-
-                  <h3 className="text-2xl font-bold">
-                    Choose Payment Method
-                  </h3>
-
-                  <button
-                    type="button"
-                    className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl text-lg font-semibold mt-6"
-                  >
-                    Pay with M-Pesa
-                  </button>
-
-                  <button
-                    type="button"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl text-lg font-semibold"
-                  >
-                    Pay with PayPal
-                  </button>
-
-                  <p className="text-center text-gray-500 text-sm mt-6">
-                    Secure payment processing.
-                    Your payment details are never stored on this website.
-                  </p>
-
-                </form>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-        {/* Trust Section */}
-
-        <section className="bg-white py-20">
-
-          <div className="max-w-6xl mx-auto px-6">
-
-            <div className="grid md:grid-cols-3 gap-10 text-center">
-
-              <div>
-
-                <h3 className="text-2xl font-bold">
-                  🔒 Secure Payments
-                </h3>
-
-                <p className="mt-4 text-gray-600">
-                  Protected checkout using trusted payment providers.
-                </p>
-
-              </div>
-
-              <div>
-
-                <h3 className="text-2xl font-bold">
-                  ⚡ Instant Delivery
-                </h3>
-
-                <p className="mt-4 text-gray-600">
-                  Receive your eBook immediately after payment.
-                </p>
-
-              </div>
-
-              <div>
-
-                <h3 className="text-2xl font-bold">
-                  📖 Lifetime Access
-                </h3>
-
-                <p className="mt-4 text-gray-600">
-                  Download your purchased book anytime.
-                </p>
-
-              </div>
-
-            </div>
-
-            <div className="text-center mt-16">
-
-              <Link
-                href="/books/book-1"
-                className="text-amber-700 font-semibold hover:underline"
-              >
-                ← Back to Book Details
-              </Link>
-
-            </div>
-
-          </div>
-
-        </section>
-
+  const router = useRouter();
+
+  const book = books.find((book) => book.available);
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  if (!book) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <h1 className="text-3xl font-bold">
+          No book is currently available.
+        </h1>
       </main>
+    );
+  }
 
-      <Footer />
-    </>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handlePayment = async () => {
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.phone
+    ) {
+      alert("Please complete all fields.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          amount: book.price,
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log("Payment Response:", data);
+
+      if (!response.ok) {
+        alert(data.message || "Payment failed.");
+        return;
+      }
+
+      // Works with either your API response or the raw IntaSend response
+      const apiRef =
+        data.api_ref ||
+        data.invoice?.api_ref ||
+        data.payment?.invoice?.api_ref;
+
+      if (!apiRef) {
+        alert("Payment started, but no payment reference was returned.");
+        return;
+      }
+
+      // Redirect to success page immediately
+      router.push(`/payment/success?api_ref=${apiRef}`);
+    } catch (error) {
+      console.error("Payment Error:", error);
+      alert("Something went wrong while initiating payment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <main className="min-h-screen bg-[#F7F2EB] py-20 px-6">
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16">
+
+        {/* Book Summary */}
+        <div className="bg-white rounded-3xl shadow-xl p-8">
+
+          <img
+            src={book.cover}
+            alt={book.title}
+            className="rounded-2xl shadow-lg w-full"
+          />
+
+          <h1 className="text-4xl font-bold mt-8">
+            {book.title}
+          </h1>
+
+          <h2 className="text-xl text-gray-600 mt-3">
+            {book.subtitle}
+          </h2>
+
+          <p className="mt-6">
+            <strong>Author:</strong> {book.author}
+          </p>
+
+          <p className="mt-3">
+            <strong>Age Rating:</strong> {book.ageRating}
+          </p>
+
+          <div className="mt-8">
+            <PriceTag price={book.price} />
+          </div>
+
+        </div>
+
+        {/* Customer Details */}
+        <div className="bg-white rounded-3xl shadow-xl p-8">
+
+          <h2 className="text-3xl font-bold mb-8">
+            Customer Details
+          </h2>
+
+          <div className="space-y-6">
+
+            <input
+              type="text"
+              name="firstName"
+              placeholder="First Name"
+              value={formData.firstName}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-5 py-4"
+            />
+
+            <input
+              type="text"
+              name="lastName"
+              placeholder="Last Name"
+              value={formData.lastName}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-5 py-4"
+            />
+
+            <input
+              type="email"
+              name="email"
+              placeholder="Email Address"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-5 py-4"
+            />
+
+            <input
+              type="tel"
+              name="phone"
+              placeholder="2547XXXXXXXX"
+              value={formData.phone}
+              onChange={handleChange}
+              className="w-full border rounded-xl px-5 py-4"
+            />
+
+            <button
+              onClick={handlePayment}
+              disabled={loading}
+              className="w-full bg-amber-700 hover:bg-amber-800 disabled:bg-gray-400 text-white py-4 rounded-xl text-lg font-semibold transition"
+            >
+              {loading
+                ? "Sending STK Push..."
+                : `Pay KES ${book.price} with M-Pesa`}
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    </main>
   );
 }
