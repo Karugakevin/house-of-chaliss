@@ -20,7 +20,7 @@ export default async function AdminLayout({
     redirect("/admin/login");
   }
 
-  if (!isAdmin(user.email)) {
+  if (!(await isAdmin())) {
     redirect("/");
   }
 

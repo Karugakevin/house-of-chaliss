@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
 
   const apiRef = searchParams.get("api_ref");
@@ -65,9 +65,7 @@ export default function PaymentSuccessPage() {
 
           case "failed":
             setLoading(false);
-            setMessage(
-              "Your payment failed. Please try again."
-            );
+            setMessage("Your payment failed. Please try again.");
             clearInterval(interval);
             break;
 
@@ -89,13 +87,11 @@ export default function PaymentSuccessPage() {
     interval = setInterval(checkPayment, 5000);
 
     return () => clearInterval(interval);
-
   }, [apiRef]);
 
   return (
-    <main className="min-h-screen bg-[#F7F2EB] flex items-center justify-center px-6">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-10 text-center">
-
+    <main className="min-h-screen flex items-center justify-center px-4">
+      <div className="text-center max-w-2xl">
         <div className="text-6xl">
           {status === "paid" ? "🎉" : "📖"}
         </div>
@@ -110,9 +106,7 @@ export default function PaymentSuccessPage() {
 
         {loading && (
           <div className="mt-10">
-            <div className="animate-pulse text-5xl">
-              ⏳
-            </div>
+            <div className="animate-pulse text-5xl">⏳</div>
           </div>
         )}
 
@@ -131,8 +125,27 @@ export default function PaymentSuccessPage() {
         >
           Return to Home
         </Link>
-
       </div>
     </main>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen flex items-center justify-center px-4">
+          <div className="text-center">
+            <div className="animate-pulse text-5xl">⏳</div>
+
+            <h1 className="text-3xl font-bold text-[#1F2D3D] mt-6">
+              Checking Payment...
+            </h1>
+          </div>
+        </main>
+      }
+    >
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

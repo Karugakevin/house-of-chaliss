@@ -72,7 +72,7 @@ export async function GET(
         ).toLocaleDateString(),
     });
 
-    return new NextResponse(pdf, {
+    return new NextResponse(Buffer.from(pdf), {
         headers: {
             "Content-Type":
                 "application/pdf",

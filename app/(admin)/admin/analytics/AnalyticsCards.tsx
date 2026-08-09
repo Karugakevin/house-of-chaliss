@@ -110,7 +110,7 @@ export default function AnalyticsCards({
 
                                     {currency}{" "}
 
-                                    {amount.toLocaleString()}
+                                    {Number(amount).toLocaleString()}
 
                                 </h2>
 

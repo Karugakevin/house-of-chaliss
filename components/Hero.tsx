@@ -66,7 +66,7 @@ export default function Hero() {
           <div className="flex justify-center lg:justify-end mt-2 lg:mt-0">
 
             <img
-              src={featuredBook.heroImage || featuredBook.cover}
+              src={featuredBook.cover}
               alt={`${featuredBook.title} - House of Chaliss Book One`}
               className="w-full max-w-[340px] sm:max-w-[400px] md:max-w-[480px] lg:max-w-[560px] h-auto rounded-2xl sm:rounded-3xl shadow-2xl hover:scale-[1.02] transition duration-300"
             />

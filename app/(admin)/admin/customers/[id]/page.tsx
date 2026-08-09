@@ -60,7 +60,6 @@ export default async function CustomerDetailsPage({
       <CustomerProfile customer={customer} />
 
       <CustomerStats
-        customer={customer}
         purchases={purchases ?? []}
       />
 

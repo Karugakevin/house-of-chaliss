@@ -35,8 +35,9 @@ export default async function PaymentsPage({
         );
     }
 
-    const { data: purchases = [] } =
-        await query;
+    const { data } = await query;
+
+    const purchases = data ?? [];
 
     const filtered =
         params.search
