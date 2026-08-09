@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { updateBook } from "./actions";
+import { updateBook } from "../../customers/[id]/actions";
 
 interface Props {
   book: any;

@@ -35,9 +35,13 @@ export default function AddBookForm() {
         "/admin/books";
 
     } else {
+      const result = await response.json().catch(() => null);
 
-      alert("Unable to create book.");
-
+      alert(
+        result?.error ||
+        result?.message ||
+        "Unable to create book."
+      );
     }
 
   }

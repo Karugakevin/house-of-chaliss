@@ -1,26 +1,50 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase-server";
 import supabaseAdmin from "@/lib/supabase-admin";
+import { isAdmin } from "@/lib/is-admin";
+
+async function requireAdmin() {
+  const admin = await isAdmin();
+
+  if (!admin) {
+    throw new Error("Unauthorized");
+  }
+}
 
 export async function updateBook(formData: FormData) {
-  const id = formData.get("id") as string;
+  await requireAdmin();
 
-  const title = formData.get("title") as string;
-  const subtitle = formData.get("subtitle") as string;
-  const author = formData.get("author") as string;
-  const description = formData.get("description") as string;
-
+  const id = String(formData.get("id") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const subtitle = String(formData.get("subtitle") ?? "").trim();
+  const author = String(formData.get("author") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
   const price = Number(formData.get("price"));
+  const published = formData.get("published") === "true";
 
-  const published =
-    formData.get("published") === "true";
+  if (!id) {
+    throw new Error("Book ID is required.");
+  }
+
+  if (!title) {
+    throw new Error("Book title is required.");
+  }
+
+  if (!author) {
+    throw new Error("Author is required.");
+  }
+
+  if (!Number.isFinite(price) || price < 0) {
+    throw new Error("Invalid book price.");
+  }
 
   const { error } = await supabaseAdmin
     .from("books")
     .update({
       title,
-      subtitle,
+      subtitle: subtitle || null,
       author,
       description,
       price,
@@ -31,29 +55,45 @@ export async function updateBook(formData: FormData) {
   if (error) {
     throw new Error(error.message);
   }
-  
+
   revalidatePath("/admin/books");
   revalidatePath(`/admin/books/${id}`);
+  revalidatePath(`/books/${id}`);
 }
-export async function uploadPdf(formData: FormData) {
-  const id = formData.get("id") as string;
-  const pdf = formData.get("pdf") as File;
 
-  if (!pdf || pdf.size === 0) {
+export async function uploadPdf(formData: FormData) {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "").trim();
+  const pdf = formData.get("pdf");
+
+  if (!id) {
+    throw new Error("Book ID is required.");
+  }
+
+  if (!(pdf instanceof File) || pdf.size === 0) {
     throw new Error("No PDF selected.");
   }
 
-  const extension = pdf.name.split(".").pop();
+  if (pdf.type !== "application/pdf") {
+    throw new Error("Only PDF files are allowed.");
+  }
 
-  const path = `books/${id}.${extension}`;
+  // 50 MB maximum
+  const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
-  const { error: uploadError } =
-    await supabaseAdmin.storage
-      .from("ebooks")
-      .upload(path, pdf, {
-        upsert: true,
-        contentType: "application/pdf",
-      });
+  if (pdf.size > MAX_FILE_SIZE) {
+    throw new Error("PDF file must be 50 MB or smaller.");
+  }
+
+  const path = `books/${id}.pdf`;
+
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from("ebooks")
+    .upload(path, pdf, {
+      upsert: true,
+      contentType: "application/pdf",
+    });
 
   if (uploadError) {
     throw new Error(uploadError.message);

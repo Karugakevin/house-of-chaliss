@@ -1,5 +1,6 @@
-import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
+import FeaturedBooks from "../components/FeaturedBooks";
+import BookSeries from "../components/BookSeries";
 import AboutBook from "../components/AboutBook";
 import WhyRead from "../components/WhyRead";
 import Author from "../components/Author";
@@ -10,15 +11,26 @@ import Footer from "../components/Footer";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#F7F2EB] text-[#1F2D3D]">
+    <>
       <Hero />
+
+      <FeaturedBooks />
+
+      <BookSeries />
+
       <AboutBook />
+
       <WhyRead />
+
       <Author />
+
       <Reviews />
+
       <FAQ />
+
       <CTA />
+
       <Footer />
-    </main>
+    </>
   );
 }

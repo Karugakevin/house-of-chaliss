@@ -1,6 +1,9 @@
 import Link from "next/link";
 import supabaseAdmin from "@/lib/supabase-admin";
 import PublishToggle from "./PublishToggle";
+import BookSearch from "./BookSearch";
+import BookStatusFilter from "./BookStatusFilter";
+import ExportBooksButton from "./ExportBooksButton";
 
 type Book = {
   id: string;
@@ -19,16 +22,43 @@ type Purchase = {
   amount: number;
 };
 
-export default async function BooksPage() {
+interface PageProps {
+    searchParams: Promise<{
+        search?: string;
+        status?: string;
+    }>;
+}
+
+export default async function BooksPage({
+    searchParams,
+}: PageProps) {
+    const { search, status } = await searchParams;
   const supabase = supabaseAdmin;
 
-  const { data: books, error } = await supabase
-    .from("books")
-    .select("*")
-    .order("created_at", {
-      ascending: false,
-    });
+    let query = supabase
+        .from("books")
+        .select("*");
 
+    if (search) {
+        query = query.or(
+            `title.ilike.%${search}%,author.ilike.%${search}%`
+        );
+    }
+
+    if (status === "published") {
+        query = query.eq("published", true);
+    }
+
+    if (status === "draft") {
+        query = query.eq("published", false);
+    }
+
+    const { data: books, error } = await query.order(
+        "created_at",
+        {
+            ascending: false,
+        }
+    );
   if (error) {
     return (
       <div className="p-10">
@@ -77,18 +107,28 @@ export default async function BooksPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="bg-amber-100 text-amber-900 rounded-lg px-5 py-3 font-medium">
-            Total Books: {rows.length}
-          </div>
+              <div className="flex items-center gap-4">
 
-          <Link
-            href="/admin/books/new"
-            className="bg-amber-700 hover:bg-amber-800 text-white px-6 py-3 rounded-lg font-medium"
-          >
-            + Add Book
-          </Link>
-        </div>
+                  <BookSearch />
+
+                  <BookStatusFilter />
+
+                  <div className="bg-amber-100 text-amber-900 rounded-lg px-5 py-3 font-medium">
+                      Total Books: {rows.length}
+                  </div>
+
+                  <ExportBooksButton
+                      books={books ?? []}
+                  />
+
+                  <Link
+                      href="/admin/books/new"
+                      className="bg-amber-700 hover:bg-amber-800 text-white px-6 py-3 rounded-lg font-medium"
+                  >
+                      + Add Book
+                  </Link>
+
+              </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">

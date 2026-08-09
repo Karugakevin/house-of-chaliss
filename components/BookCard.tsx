@@ -9,7 +9,12 @@ interface BookCardProps {
 
 export default function BookCard({ book }: BookCardProps) {
   return (
-    <div className="bg-white rounded-3xl shadow-xl overflow-hidden hover:-translate-y-2 transition duration-300">
+    
+    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300">
+
+      <div className="bg-red-600 text-white text-4xl p-6">
+        THIS IS BOOKCARD
+      </div>
 
       <img
         src={book.cover}
@@ -31,6 +36,27 @@ export default function BookCard({ book }: BookCardProps) {
           {book.subtitle}
         </p>
 
+        {/* Author */}
+
+        <p className="mt-4 text-gray-700">
+          <span className="font-semibold">Author:</span>{" "}
+          {book.author}
+        </p>
+
+        {/* Genres */}
+
+        <p className="mt-3 text-gray-700">
+          <span className="font-semibold">Genres:</span>{" "}
+          {book.genre.join(", ")}
+        </p>
+
+        {/* Age Rating */}
+
+        <p className="mt-3 text-gray-700">
+          <span className="font-semibold">Age Rating:</span>{" "}
+          {book.ageRating}
+        </p>
+
         <p className="mt-6 text-gray-600 leading-7">
           {book.description || "More details coming soon."}
         </p>
@@ -40,11 +66,11 @@ export default function BookCard({ book }: BookCardProps) {
           <PriceTag price={book.price} />
 
           {book.available ? (
-            <PrimaryButton href={`/books/${book.id}`}>
+            <PrimaryButton href={`/books/${book.slug}`}>
               View Book
             </PrimaryButton>
           ) : (
-            <span className="text-gray-500 font-semibold">
+            <span className="px-4 py-2 rounded-lg bg-gray-200 text-gray-600 font-semibold">
               Coming Soon
             </span>
           )}

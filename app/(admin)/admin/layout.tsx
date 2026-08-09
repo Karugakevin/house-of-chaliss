@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
-import { isAdminEmail } from "@/lib/is-admin";
+import { isAdmin } from "@/lib/is-admin";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,11 +20,7 @@ export default async function AdminLayout({
     redirect("/admin/login");
   }
 
-  if (!user) {
-    redirect("/admin/login");
-  }
-  
-  if (!isAdminEmail(user.email)) {
+  if (!isAdmin(user.email)) {
     redirect("/");
   }
 
@@ -32,6 +28,10 @@ export default async function AdminLayout({
     {
       name: "Dashboard",
       href: "/admin",
+    },
+    {
+      name: "Books",
+      href: "/admin/books",
     },
     {
       name: "Purchases",
@@ -42,12 +42,12 @@ export default async function AdminLayout({
       href: "/admin/customers",
     },
     {
-      name: "Books",
-      href: "/admin/books",
-    },
-    {
       name: "Analytics",
       href: "/admin/analytics",
+    },
+    {
+      name: "Payments",
+      href: "/admin/payments",
     },
     {
       name: "Settings",
@@ -64,6 +64,8 @@ export default async function AdminLayout({
 
         <aside className="w-72 min-h-screen bg-[#1F2D3D] text-white flex flex-col">
 
+          {/* Logo */}
+
           <div className="p-8 border-b border-white/10">
 
             <h1 className="text-2xl font-bold">
@@ -76,6 +78,8 @@ export default async function AdminLayout({
 
           </div>
 
+          {/* Navigation */}
+
           <nav className="flex-1 px-4 py-6 space-y-2">
 
             {navigation.map((item) => (
@@ -83,7 +87,7 @@ export default async function AdminLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className="block rounded-lg px-4 py-3 hover:bg-white/10 transition"
+                className="block rounded-lg px-4 py-3 hover:bg-white/10 hover:translate-x-1 transition-all duration-200"
               >
                 {item.name}
               </Link>
@@ -92,20 +96,22 @@ export default async function AdminLayout({
 
           </nav>
 
+          {/* User */}
+
           <div className="border-t border-white/10 p-6">
 
-            <p className="text-xs text-gray-400">
+            <p className="text-xs uppercase tracking-wide text-gray-400">
               Logged in as
             </p>
 
-            <p className="mt-1 font-medium break-all">
+            <p className="mt-2 font-medium break-all">
               {user.email}
             </p>
 
             <form
               action="/auth/logout"
               method="post"
-              className="mt-5"
+              className="mt-6"
             >
               <button
                 type="submit"
@@ -121,7 +127,7 @@ export default async function AdminLayout({
 
         {/* Main Content */}
 
-        <main className="flex-1 p-10">
+        <main className="flex-1 overflow-y-auto p-10">
 
           {children}
 

@@ -56,7 +56,7 @@ export default function AuthorPage() {
               <div className="mt-12 flex gap-5">
 
                 <a
-                  href="/books/book-1"
+                  href="/checkout/house-of-chaliss"
                   className="bg-amber-700 hover:bg-amber-800 text-white px-8 py-4 rounded-xl font-semibold"
                 >
                   Read Book One

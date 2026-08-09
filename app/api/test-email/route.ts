@@ -1,30 +1,20 @@
 import { NextResponse } from "next/server";
-import { sendPurchaseEmail } from "@/lib/sendPurchaseEmail";
+import { sendEmail } from "@/lib/email/sendEmail";
 
 export async function GET() {
-  try {
-    await sendPurchaseEmail({
-      firstName: "Kevin",
-      email: "karugakevin@gmail.com",
-      token: "test-download-token",
+    await sendEmail({
+        to: "karugakevin@gmail.com",
+        subject: "House of Chaliss Test",
+        html: `
+      <h1>Email system is working!</h1>
+
+      <p>
+        This is your first email sent from the bookstore.
+      </p>
+    `,
     });
 
     return NextResponse.json({
-      success: true,
-      message: "Test email sent successfully.",
+        success: true,
     });
-  } catch (error) {
-    console.error(error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to send email.",
-        error,
-      },
-      {
-        status: 500,
-      }
-    );
-  }
 }

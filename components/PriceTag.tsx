@@ -1,11 +1,19 @@
-interface PriceTagProps {
+export default function PriceTag({
+  price,
+}: {
   price: number;
-}
-
-export default function PriceTag({ price }: PriceTagProps) {
+}) {
   return (
-    <span className="text-3xl font-bold text-amber-700">
-      KES {price.toLocaleString()}
-    </span>
+    <div>
+
+      <p className="text-sm uppercase tracking-widest text-gray-500">
+        Price
+      </p>
+
+      <p className="text-5xl font-extrabold text-amber-700">
+        KES {price.toLocaleString()}
+      </p>
+
+    </div>
   );
 }

@@ -1,48 +1,96 @@
 import { NextRequest, NextResponse } from "next/server";
-import supabase from "@/lib/supabase";
 import { v4 as uuidv4 } from "uuid";
+
+import supabaseAdmin from "@/lib/supabase-admin";
 import { sendPurchaseEmail } from "@/lib/sendPurchaseEmail";
 
 export async function POST(req: NextRequest) {
   try {
+
     const body = await req.json();
 
-    console.log("========== INTASEND WEBHOOK ==========");
-    console.log(body);
+    console.log("========== WEBHOOK RECEIVED ==========");
+    console.dir(body, { depth: null });
     console.log("======================================");
 
-    const {
-      api_ref,
-      invoice_id,
-      state,
-      failed_reason,
-      value,
-    } = body;
-
-    // Find purchase
-    const { data: purchase, error: purchaseError } = await supabase
-      .from("purchases")
-      .select("*")
-      .eq("api_ref", api_ref)
-      .single();
-
-    if (purchaseError || !purchase) {
-      console.error("Purchase not found.");
+    // Verify webhook challenge
+    if (body.challenge !== process.env.INTASEND_WEBHOOK_CHALLENGE) {
+      console.error("Invalid webhook challenge:", body.challenge);
 
       return NextResponse.json(
         {
           success: false,
-          message: "Purchase not found.",
+          message: "Invalid webhook challenge.",
         },
         {
-          status: 404,
+          status: 401,
         }
       );
     }
 
+    const api_ref = body.api_ref;
+    const invoice_id = body.invoice_id;
+    const state = body.state;
+    const value = body.value;
+    const failed_reason = body.failed_reason;
+
+    const transaction_id =
+      body.mpesa_reference ??
+      body.provider_ref ??
+      null;
+
+    //--------------------------------------------------
+    // Find Purchase
+    //--------------------------------------------------
+
+    const {
+      data: purchase,
+      error: purchaseError,
+    } = await supabaseAdmin
+      .from("purchases")
+      .select("*")
+      .eq("api_ref", api_ref)
+      .maybeSingle();
+
+    console.log("Webhook api_ref:", api_ref);
+    console.log("Purchase lookup result:", purchase);
+    console.log("Purchase lookup error:", purchaseError);
+
+    if (purchaseError || !purchase) {
+      console.error("Purchase lookup failed.");
+      console.error("api_ref:", api_ref);
+      console.error("purchase:", purchase);
+      console.error("purchaseError:", purchaseError);
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: purchaseError?.message ?? "Purchase not found.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    // Prevent duplicate processing
+    if (purchase.payment_status === "paid") {
+      console.log("Purchase already marked as paid.");
+
+      return NextResponse.json({
+        success: true,
+      });
+    }
+
+    //--------------------------------------------------
+    // PAYMENT STATES
+    //--------------------------------------------------
+
     switch (state) {
+
       case "PENDING":
-        await supabase
+
+        await supabaseAdmin
           .from("purchases")
           .update({
             payment_status: "pending",
@@ -50,11 +98,13 @@ export async function POST(req: NextRequest) {
           })
           .eq("id", purchase.id);
 
-        console.log("🕒 Payment pending...");
+        console.log("Payment Pending");
+
         break;
 
       case "PROCESSING":
-        await supabase
+
+        await supabaseAdmin
           .from("purchases")
           .update({
             payment_status: "processing",
@@ -62,11 +112,13 @@ export async function POST(req: NextRequest) {
           })
           .eq("id", purchase.id);
 
-        console.log("⏳ Payment processing...");
+        console.log("Payment Processing");
+
         break;
 
       case "FAILED":
-        await supabase
+
+        await supabaseAdmin
           .from("purchases")
           .update({
             payment_status: "failed",
@@ -75,11 +127,13 @@ export async function POST(req: NextRequest) {
           })
           .eq("id", purchase.id);
 
-        console.log("❌ Payment failed.");
+        console.log("Payment Failed");
+
         break;
 
       case "RETRY":
-        await supabase
+
+        await supabaseAdmin
           .from("purchases")
           .update({
             payment_status: "retry",
@@ -88,29 +142,46 @@ export async function POST(req: NextRequest) {
           })
           .eq("id", purchase.id);
 
-        console.log("🔄 Retry requested.");
+        console.log("Retry Requested");
+
         break;
 
-      case "COMPLETE": {
-        // Update purchase
-        await supabase
+      case "COMPLETE":
+
+        //--------------------------------------------------
+        // Mark Purchase Paid
+        //--------------------------------------------------
+
+        await supabaseAdmin
           .from("purchases")
           .update({
             payment_status: "paid",
             invoice_id,
+            transaction_id,
             amount: Number(value),
+            failed_reason: null,
           })
           .eq("id", purchase.id);
 
-        // Refresh purchase (gets latest email_sent value)
-        const { data: latestPurchase } = await supabase
+        //--------------------------------------------------
+        // Refresh Purchase
+        //--------------------------------------------------
+
+        const {
+          data: latestPurchase,
+        } = await supabaseAdmin
           .from("purchases")
           .select("*")
           .eq("id", purchase.id)
           .single();
 
-        // Create download token if needed
-        const { data: existingToken } = await supabase
+        //--------------------------------------------------
+        // Create Download Token
+        //--------------------------------------------------
+
+        const {
+          data: existingToken,
+        } = await supabaseAdmin
           .from("download_tokens")
           .select("*")
           .eq("purchase_id", purchase.id)
@@ -119,65 +190,86 @@ export async function POST(req: NextRequest) {
         let token = existingToken?.token;
 
         if (!existingToken) {
+
           token = uuidv4();
 
-          const expiresAt = new Date();
-          expiresAt.setHours(expiresAt.getHours() + 24);
+          const expires = new Date();
 
-          const { error: tokenError } = await supabase
-            .from("download_tokens")
-            .insert({
-              purchase_id: purchase.id,
-              token,
-              downloads: 0,
-              expires_at: expiresAt.toISOString(),
-            });
+          expires.setHours(expires.getHours() + 24);
+
+          const { error: tokenError } =
+            await supabaseAdmin
+              .from("download_tokens")
+              .insert({
+                purchase_id: purchase.id,
+                token,
+                downloads: 0,
+                expires_at: expires.toISOString(),
+              });
 
           if (tokenError) {
-            console.error("Token creation failed:", tokenError);
+            console.error(tokenError);
           } else {
-            console.log("✅ Download token created.");
+            console.log("Download token created.");
           }
+
         }
 
-        // Send email only once
-        if (!latestPurchase?.email_sent) {
-          const { data: customer } = await supabase
+        //--------------------------------------------------
+        // Send Email Once
+        //--------------------------------------------------
+
+        if (!latestPurchase?.email_sent && token) {
+
+          const {
+            data: customer,
+          } = await supabaseAdmin
             .from("customers")
             .select("first_name,email")
             .eq("id", purchase.customer_id)
             .single();
 
-          if (customer?.email && token) {
+          if (customer?.email) {
+
             try {
+
               await sendPurchaseEmail({
                 firstName: customer.first_name,
                 email: customer.email,
                 token,
               });
 
-              await supabase
+              await supabaseAdmin
                 .from("purchases")
                 .update({
                   email_sent: true,
                 })
                 .eq("id", purchase.id);
 
-              console.log("📧 Purchase email sent.");
+              console.log("Purchase Email Sent");
+
             } catch (err) {
-              console.error("Email failed:", err);
+
+              console.error("Email Error", err);
+
             }
+
           }
+
         } else {
-          console.log("📧 Email already sent. Skipping.");
+
+          console.log("Email already sent.");
+
         }
 
-        console.log("✅ Payment completed.");
+        console.log("Payment Complete");
+
         break;
-      }
 
       default:
-        console.log(`Unhandled state: ${state}`);
+
+        console.log("Unhandled State:", state);
+
     }
 
     return NextResponse.json({
@@ -185,15 +277,24 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
+
+    console.error("WEBHOOK ERROR");
+
     console.error(error);
 
     return NextResponse.json(
       {
         success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unknown Error",
       },
       {
         status: 500,
       }
     );
+
   }
+
 }
