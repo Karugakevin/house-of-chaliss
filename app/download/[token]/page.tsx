@@ -121,7 +121,7 @@ export default async function DownloadPage({ params }: Props) {
     data: signedUrl,
     error: signedError,
   } = await supabaseAdmin.storage
-    .from("books")
+    .from("ebooks")
     .createSignedUrl(book.pdf_url, 60);
 
   console.log("Signed URL:");
