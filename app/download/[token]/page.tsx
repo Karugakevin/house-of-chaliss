@@ -119,12 +119,21 @@ export default async function DownloadPage({ params }: Props) {
   // Signed URL
   // --------------------------------------------------
 
+  const bucket = process.env.SUPABASE_EBOOK_BUCKET || "ebooks";
+
+  const pdfPath = String(book.pdf_url)
+    .replace(/^ebooks\//, "");
+
+  console.log("DOWNLOAD BUCKET:", bucket);
+  console.log("ORIGINAL PDF PATH:", book.pdf_url);
+  console.log("NORMALIZED PDF PATH:", pdfPath);
+
   const {
     data: signedUrl,
     error: signedError,
   } = await supabaseAdmin.storage
-    .from("ebooks")
-    .createSignedUrl(book.pdf_url, 60);
+    .from(bucket)
+    .createSignedUrl(pdfPath, 60);
 
   console.log("Signed URL:");
   console.dir(signedUrl, { depth: null });
@@ -133,6 +142,7 @@ export default async function DownloadPage({ params }: Props) {
   console.dir(signedError, { depth: null });
 
   if (signedError || !signedUrl) {
+    console.error("FAILED TO CREATE SIGNED URL");
     notFound();
   }
 
