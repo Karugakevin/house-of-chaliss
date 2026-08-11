@@ -1,7 +1,4 @@
-import { notFound, redirect } from "next/navigation";
-import supabaseAdmin from "@/lib/supabase-admin";
-
-const MAX_DOWNLOADS = Number(process.env.MAX_DOWNLOADS || 3);
+import { redirect } from "next/navigation";
 
 interface Props {
   params: Promise<{
@@ -9,156 +6,12 @@ interface Props {
   }>;
 }
 
-export default async function DownloadPage({ params }: Props) {
+export default async function DownloadPage({
+  params,
+}: Props) {
   const { token } = await params;
 
-  console.log("====================================");
-  console.log("DOWNLOAD TOKEN:", token);
+  console.log("DOWNLOAD PAGE TOKEN:", token);
 
-  // --------------------------------------------------
-  // Find download token
-  // --------------------------------------------------
-
-  const {
-    data: downloadToken,
-    error: tokenError,
-  } = await supabaseAdmin
-    .from("download_tokens")
-    .select("*")
-    .eq("token", token)
-    .maybeSingle();
-
-  console.log("Download Token:");
-  console.dir(downloadToken, { depth: null });
-
-  console.log("Download Token Error:");
-  console.dir(tokenError, { depth: null });
-
-  if (tokenError || !downloadToken) {
-    console.log("Download token not found.");
-    notFound();
-  }
-
-  // --------------------------------------------------
-  // Expiry
-  // --------------------------------------------------
-
-  if (new Date(downloadToken.expires_at) < new Date()) {
-    return (
-      <main className="max-w-xl mx-auto py-20">
-        <h1 className="text-3xl font-bold">
-          Download link expired.
-        </h1>
-      </main>
-    );
-  }
-
-  // --------------------------------------------------
-  // Download limit
-  // --------------------------------------------------
-
-  if (downloadToken.downloads >= MAX_DOWNLOADS) {
-    return (
-      <main className="max-w-xl mx-auto py-20">
-        <h1 className="text-3xl font-bold">
-          Download limit reached.
-        </h1>
-      </main>
-    );
-  }
-
-  // --------------------------------------------------
-  // Purchase
-  // --------------------------------------------------
-
-  const {
-    data: purchase,
-    error: purchaseError,
-  } = await supabaseAdmin
-    .from("purchases")
-    .select("*")
-    .eq("id", downloadToken.purchase_id)
-    .maybeSingle();
-
-  console.log("Purchase:");
-  console.dir(purchase, { depth: null });
-
-  console.log("Purchase Error:");
-  console.dir(purchaseError, { depth: null });
-
-  if (purchaseError || !purchase) {
-    console.log("Purchase not found.");
-    notFound();
-  }
-
-  // --------------------------------------------------
-  // Book
-  // --------------------------------------------------
-
-  const {
-    data: book,
-    error: bookError,
-  } = await supabaseAdmin
-    .from("books")
-    .select("*")
-    .eq("id", purchase.book_id)
-    .maybeSingle();
-
-  console.log("Book:");
-  console.dir(book, { depth: null });
-
-  console.log("Book Error:");
-  console.dir(bookError, { depth: null });
-
-  if (bookError || !book) {
-    console.log("Book not found.");
-    notFound();
-  }
-
-  // --------------------------------------------------
-  // Signed URL
-  // --------------------------------------------------
-
-  const bucket = process.env.SUPABASE_EBOOK_BUCKET || "ebooks";
-
-  const pdfPath = String(book.pdf_url)
-    .replace(/^ebooks\//, "");
-
-  console.log("DOWNLOAD BUCKET:", bucket);
-  console.log("ORIGINAL PDF PATH:", book.pdf_url);
-  console.log("NORMALIZED PDF PATH:", pdfPath);
-
-  const {
-    data: signedUrl,
-    error: signedError,
-  } = await supabaseAdmin.storage
-    .from(bucket)
-    .createSignedUrl(pdfPath, 60);
-
-  console.log("Signed URL:");
-  console.dir(signedUrl, { depth: null });
-
-  console.log("Signed URL Error:");
-  console.dir(signedError, { depth: null });
-
-  if (signedError || !signedUrl) {
-    console.error("FAILED TO CREATE SIGNED URL");
-    notFound();
-  }
-
-  // --------------------------------------------------
-  // Increment downloads
-  // --------------------------------------------------
-
-  await supabaseAdmin
-    .from("download_tokens")
-    .update({
-      downloads: downloadToken.downloads + 1,
-    })
-    .eq("id", downloadToken.id);
-
-  console.log("Redirecting to PDF...");
-
-  redirect(signedUrl.signedUrl);
-}// Netlify deployment check
-// production env update
+  redirect(`/api/download/${token}`);
+}
