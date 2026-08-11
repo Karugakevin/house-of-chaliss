@@ -1,6 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import supabaseAdmin from "@/lib/supabase-admin";
 
+const MAX_DOWNLOADS = Number(process.env.MAX_DOWNLOADS || 3);
+
 interface Props {
   params: Promise<{
     token: string;
@@ -55,7 +57,7 @@ export default async function DownloadPage({ params }: Props) {
   // Download limit
   // --------------------------------------------------
 
-  if (downloadToken.downloads >= 5) {
+  if (downloadToken.downloads >= MAX_DOWNLOADS) {
     return (
       <main className="max-w-xl mx-auto py-20">
         <h1 className="text-3xl font-bold">
@@ -121,7 +123,7 @@ export default async function DownloadPage({ params }: Props) {
     data: signedUrl,
     error: signedError,
   } = await supabaseAdmin.storage
-    .from("books")
+    .from("ebooks")
     .createSignedUrl(book.pdf_url, 60);
 
   console.log("Signed URL:");
