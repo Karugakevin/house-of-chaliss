@@ -188,21 +188,48 @@ export async function POST(req: NextRequest) {
         // INTASEND STK PUSH
         // ---------------------------------------------------
 
-        const paymentResponse = await collection.mpesaStkPush({
-            first_name: customer.first_name,
-            last_name: customer.last_name,
-            email: customer.email,
-            phone_number: customer.phone,
-            amount: book.price,
-            host:
-                process.env.NEXT_PUBLIC_SITE_URL ??
-                "http://localhost:3000",
-            api_ref: apiRef,
-        });
+        let paymentResponse;
 
-        console.log("INTASEND RESPONSE");
+        try {
+            paymentResponse = await collection.mpesaStkPush({
+                first_name: customer.first_name,
+                last_name: customer.last_name,
+                email: customer.email,
+                phone_number: customer.phone,
+                amount: book.price,
+                host:
+                    process.env.NEXT_PUBLIC_SITE_URL ??
+                    "https://www.houseofchaliss.com",
+                api_ref: apiRef,
+            });
 
-        console.dir(paymentResponse, { depth: null });
+            console.log("INTASEND RESPONSE:");
+            console.dir(paymentResponse, { depth: null });
+
+        } catch (intasendError: any) {
+            console.error("=================================");
+            console.error("INTASEND STK PUSH ERROR");
+            console.error("=================================");
+
+            console.error("Message:", intasendError?.message);
+
+            console.error(
+                "Response:",
+                intasendError?.response?.data
+            );
+
+            console.error(
+                "Status:",
+                intasendError?.response?.status
+            );
+
+            console.error(
+                "Full error:",
+                intasendError
+            );
+
+            throw intasendError;
+        }
 
         // ---------------------------------------------------
         // SAVE INTASEND REFERENCES
