@@ -176,10 +176,10 @@ export default function DownloadPolicyPage() {
                             </p>
 
                             <a
-                                href="mailto:hello@houseofchaliss.com"
+                                href="mailto:chaobliss10@gmail.com"
                                 className="inline-block mt-4 text-amber-700 font-semibold hover:underline"
                             >
-                                hello@houseofchaliss.com
+                                chaobliss10@gmail.com
                             </a>
 
                             <div className="mt-5">

@@ -63,11 +63,11 @@ export default function SupportPage() {
                                 </h3>
 
                                 <p className="mt-2 text-gray-600">
-                                    hello@houseofchaliss.com
+                                    chaobliss10@gmail.com
                                 </p>
 
                                 <a
-                                    href="mailto:hello@houseofchaliss.com"
+                                    href="mailto:chaobliss10@gmail.com"
                                     className="inline-block mt-4 text-amber-700 font-semibold hover:underline"
                                 >
                                     Contact Support →

@@ -53,7 +53,7 @@ export default function ContactPage() {
                   </h3>
 
                   <p className="mt-3 text-gray-600">
-                    hello@houseofchaliss.com
+                    chaobliss10@gmail.com
                   </p>
                 </div>
 
